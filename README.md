@@ -1,6 +1,6 @@
 # WordPress Gutenberg Playground
 
-A development environment for testing paired changes to WordPress core and Gutenberg together. Both repositories are included as subdirectories, making it easy to clone and run locally.
+A development environment for testing paired changes to WordPress core and Gutenberg together. Both repositories are included as subdirectories in a single monorepo, making it easy to clone and run locally.
 
 ## Features
 
@@ -154,28 +154,42 @@ npm run build
 npm run wp-env start
 ```
 
-## Updating from Upstream
+## Syncing with Upstream
 
-The nested repositories retain their git history. To update from upstream:
+This monorepo contains flattened copies of WordPress and Gutenberg. To sync with upstream changes:
 
 ### Gutenberg
 
 ```bash
+# Add upstream as a remote temporarily
 cd gutenberg
+git init
 git remote add upstream https://github.com/WordPress/gutenberg.git
-git fetch upstream
-git merge upstream/trunk
-# Resolve any conflicts with your changes
+git fetch upstream trunk
+
+# Review and apply changes
+git diff upstream/trunk -- .
+
+# Or cherry-pick specific commits
+git cherry-pick <commit-hash>
+
+# Clean up
+rm -rf .git
 ```
 
 ### WordPress Core
 
 ```bash
 cd wordpress-develop
+git init
 git remote add upstream https://github.com/WordPress/wordpress-develop.git
-git fetch upstream
-git merge upstream/trunk
-# Resolve any conflicts with your changes
+git fetch upstream trunk
+
+# Review and apply changes
+git diff upstream/trunk -- .
+
+# Clean up
+rm -rf .git
 ```
 
 ## License

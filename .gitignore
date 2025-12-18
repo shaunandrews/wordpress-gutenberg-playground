@@ -1,7 +1,3 @@
-# Exclude nested git repositories
-gutenberg/.git/
-wordpress-develop/.git/
-
 # Node.js
 node_modules/
 npm-debug.log
