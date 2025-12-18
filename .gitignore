@@ -1,0 +1,36 @@
+# Exclude nested git repositories
+gutenberg/.git/
+wordpress-develop/.git/
+
+# Node.js
+node_modules/
+npm-debug.log
+yarn-error.log
+
+# Build artifacts
+build/
+dist/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Editor files
+*.swp
+*.swo
+*~
+
+# Logs
+*.log
+
+# Environment files
+.env
+.env.local
+
+# wp-env local overrides (keep the shared one in wp-env/)
+.wp-env.override.json
+
+# IDE
+.idea/
+*.sublime-project
+*.sublime-workspace
