@@ -110,6 +110,27 @@ import {
 </Flex>
 ```
 
+## Accessibility Requirements
+
+WordPress follows WCAG 2.0 Level AA. Key requirements:
+
+| Requirement | Standard |
+|-------------|----------|
+| Text contrast | 4.5:1 minimum ratio |
+| Large text contrast | 3:1 (18px+ bold, 24px+ regular) |
+| UI component contrast | 3:1 (borders, icons, focus) |
+| Keyboard navigation | All interactive elements reachable via Tab |
+| Focus visibility | Focus states MORE visible than hover |
+| Minimum font size | 13-14px for body text |
+
+```jsx
+// Accessible icon button
+<Button icon={settings} label="Open settings" />
+
+// Screen reader text
+<VisuallyHidden>Additional context for screen readers</VisuallyHidden>
+```
+
 ## Common Anti-Patterns
 
 **DON'T:**
@@ -118,12 +139,16 @@ import {
 - Add inline styles for spacing - use `<Spacer>` or Flex gaps
 - Build custom modals - use `<Modal>` from @wordpress/components
 - Use `px` values directly - prefer token-based spacing
+- Use placeholder text as the only label
+- Use generic button text like "Submit" or "Click here"
 
 **DO:**
 - Import and use official components
 - Apply design tokens via CSS custom properties
 - Use `__next40pxDefaultSize` prop on buttons for modern sizing
 - Wrap interactive areas with proper focus management
+- Always provide visible labels for form fields
+- Use descriptive button text: "Save Settings" not "Submit"
 
 ## Detailed References
 
@@ -131,3 +156,4 @@ For comprehensive component APIs and token values:
 - **Components**: See [references/components.md](references/components.md) for full component list with props
 - **Design Tokens**: See [references/tokens.md](references/tokens.md) for complete token reference
 - **Patterns**: See [references/patterns.md](references/patterns.md) for complex UI recipes
+- **Guidelines**: See [references/guidelines.md](references/guidelines.md) for accessibility and design best practices
