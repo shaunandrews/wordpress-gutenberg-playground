@@ -1,0 +1,29 @@
+{
+  "name": "reading-time-estimator",
+  "version": "1.0.0",
+  "description": "WordPress plugin to display estimated reading time for posts and pages",
+  "main": "build/index.js",
+  "scripts": {
+    "build": "wp-scripts build",
+    "start": "wp-scripts start",
+    "format": "wp-scripts format",
+    "lint:js": "wp-scripts lint-js"
+  },
+  "keywords": [
+    "wordpress",
+    "plugin",
+    "reading-time",
+    "gutenberg"
+  ],
+  "author": "Your Name",
+  "license": "GPL-2.0-or-later",
+  "dependencies": {
+    "@wordpress/api-fetch": "^7.10.0",
+    "@wordpress/components": "^29.4.0",
+    "@wordpress/element": "^6.10.0",
+    "@wordpress/i18n": "^5.10.0"
+  },
+  "devDependencies": {
+    "@wordpress/scripts": "^30.6.0"
+  }
+}

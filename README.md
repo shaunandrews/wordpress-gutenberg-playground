@@ -1,13 +1,14 @@
 # WordPress Gutenberg Playground
 
-A development environment for testing paired changes to WordPress core and Gutenberg together. Both repositories are included as subdirectories in a single monorepo, making it easy to clone and run locally.
+A development environment for prototyping WordPress plugins and testing changes to WordPress core and Gutenberg. Create plugins to explore concepts, then modify core or Gutenberg as needed—all in one easy-to-run monorepo.
 
 ## Features
 
-- Custom WordPress core changes in `wordpress-develop/`
-- Custom Gutenberg plugin changes in `gutenberg/`
-- Pre-configured `wp-env` setup that links both together
-- Writing Guidance settings feature (adds content expectations/goals to Settings > Writing)
+- **Prototype plugins quickly** — Create plugins at the repo root to explore concepts and ideas
+- **Modify WordPress core** — Custom changes in `wordpress-develop/`
+- **Modify Gutenberg** — Custom plugin changes in `gutenberg/`
+- **Pre-configured wp-env** — Everything linked together, ready to run
+- Example plugin (`reading-time-estimator/`) demonstrating modern WordPress patterns
 
 ## Prerequisites
 
@@ -56,10 +57,10 @@ Once running:
 wordpress-gutenberg-playground/
 ├── gutenberg/              # Gutenberg plugin (with custom changes)
 ├── wordpress-develop/      # WordPress core (with custom changes)
-├── wp-env/                 # wp-env configuration
-│   └── .wp-env.override.json
+├── reading-time-estimator/ # Example plugin (reference implementation)
 ├── docs/                   # Custom documentation
 ├── setup.sh                # Setup script
+├── PLUGIN-SETUP.md         # Guide for creating plugins
 └── README.md
 ```
 
@@ -99,6 +100,36 @@ cd gutenberg
 npm run wp-env run cli wp <command>
 ```
 
+## Creating Plugins
+
+This playground is designed for quickly spinning up plugins to explore concepts and prototype ideas. Plugins live at the repo root and are mapped into WordPress via `gutenberg/.wp-env.override.json`.
+
+**Quick start:**
+
+```bash
+# 1. Create plugin directory with main file
+mkdir my-plugin
+cat > my-plugin/my-plugin.php << 'EOF'
+<?php
+/**
+ * Plugin Name: My Plugin
+ * Description: A quick prototype.
+ */
+EOF
+
+# 2. Add to gutenberg/.wp-env.override.json mappings:
+#    "wp-content/plugins/my-plugin": "../my-plugin"
+
+# 3. Restart wp-env and activate
+cd gutenberg
+npm run wp-env stop && npm run wp-env start
+npm run wp-env run cli wp plugin activate my-plugin
+```
+
+For plugins with React-based admin UIs using `@wordpress/components`, see the complete guide in **[PLUGIN-SETUP.md](PLUGIN-SETUP.md)**.
+
+The `reading-time-estimator/` directory contains a full reference implementation demonstrating modern WordPress plugin patterns.
+
 ## Custom Features
 
 ### Writing Guidance Settings
@@ -114,12 +145,13 @@ See [docs/writing-guidance-settings.md](docs/writing-guidance-settings.md) for d
 
 ## Configuration
 
-The `wp-env` configuration in `wp-env/.wp-env.override.json` maps:
+The `wp-env` configuration in `gutenberg/.wp-env.override.json` maps:
 
 - WordPress core source from `wordpress-develop/src`
 - Gutenberg plugin from `gutenberg/`
+- Custom plugins from the repo root
 
-This allows both custom WordPress core changes and Gutenberg changes to work together.
+This allows custom WordPress core changes, Gutenberg changes, and prototype plugins to work together.
 
 ## Troubleshooting
 
