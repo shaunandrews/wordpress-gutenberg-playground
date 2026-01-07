@@ -55,7 +55,6 @@
 }
 
 .gutenberg-experiments-page {
-	max-width: 1400px;
 
 	h1 {
 		font-size: 2rem;
@@ -264,13 +263,8 @@
 		);
 	}
 
-	&--disabled {
-		opacity: 0.6;
-
-		.experiment-card__title,
-		.experiment-card__description {
-			opacity: 0.7;
-		}
+	&--has-dependency {
+		// No opacity change - just show the notice for accessibility
 	}
 
 	&--saving {
@@ -408,17 +402,16 @@
 		}
 	}
 
-	&__disabled-reason {
+	&__dependency-notice {
 		margin-top: 12px;
 		padding: 10px 12px;
-		background: rgba(0, 0, 0, 0.04);
-		border-left: 3px solid var(--wp-components-color-gray-400, #949494);
+		background: rgba(var(--wp-admin-theme-color-rgb, 56, 88, 233), 0.06);
+		border-left: 3px solid var(--wp-admin-theme-color, #3858e9);
 		border-radius: 0 6px 6px 0;
 
 		.components-text {
 			font-size: 12px;
-			font-style: italic;
-			color: var(--wp-components-color-gray-700, #757575);
+			color: var(--wp-components-color-foreground, #1e1e1e);
 		}
 	}
 

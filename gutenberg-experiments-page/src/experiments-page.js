@@ -31,6 +31,7 @@ export default function ExperimentsPage() {
 	const [ savingIds, setSavingIds ] = useState( new Set() );
 	const [ notice, setNotice ] = useState( null );
 	const [ confirmModal, setConfirmModal ] = useState( null );
+	const [ dependencyModal, setDependencyModal ] = useState( null );
 	const [ recentlySaved, setRecentlySaved ] = useState( new Map() ); // Maps experimentId -> 'enabled' | 'disabled'
 
 	// Fetch experiments on mount.
@@ -64,7 +65,17 @@ export default function ExperimentsPage() {
 
 	// Handle toggle with dependency checking.
 	const handleToggle = useCallback(
-		async ( experimentId, newValue ) => {
+		async ( experimentId, newValue, requiredExperiment ) => {
+			// If enabling and there's an unmet dependency, show the dependency modal.
+			if ( newValue && requiredExperiment ) {
+				const experiment = experiments.find( ( exp ) => exp.id === experimentId );
+				setDependencyModal( {
+					experiment,
+					requiredExperiment,
+				} );
+				return;
+			}
+
 			// If disabling, check for dependents.
 			if ( ! newValue ) {
 				const dependents = findDependents( experimentId );
@@ -80,7 +91,7 @@ export default function ExperimentsPage() {
 			// Proceed with the update.
 			await updateExperiment( experimentId, newValue );
 		},
-		[ findDependents ]
+		[ findDependents, experiments ]
 	);
 
 	// Update a single experiment.
@@ -143,6 +154,22 @@ export default function ExperimentsPage() {
 
 		// Then disable the parent.
 		await updateExperiment( experimentId, false );
+	};
+
+	// Handle confirmation of enabling with dependencies.
+	const handleConfirmEnableWithDependency = async () => {
+		if ( ! dependencyModal ) {
+			return;
+		}
+
+		const { experiment, requiredExperiment } = dependencyModal;
+		setDependencyModal( null );
+
+		// Enable the required experiment first.
+		await updateExperiment( requiredExperiment.id, true );
+
+		// Then enable the requested experiment.
+		await updateExperiment( experiment.id, true );
 	};
 
 	// Group experiments by category.
@@ -254,6 +281,38 @@ export default function ExperimentsPage() {
 							onClick={ handleConfirmDisable }
 						>
 							{ __( 'Disable All', 'gutenberg-experiments-page' ) }
+						</Button>
+					</div>
+				</Modal>
+			) }
+
+			{ dependencyModal && (
+				<Modal
+					title={ __( 'Enable Required Experiment?', 'gutenberg-experiments-page' ) }
+					onRequestClose={ () => setDependencyModal( null ) }
+					className="gutenberg-experiments-page__modal"
+				>
+					<Text>
+						<strong>{ dependencyModal.experiment.name }</strong>
+						{ ' ' }{ __( 'requires', 'gutenberg-experiments-page' ) }{ ' ' }
+						<strong>{ dependencyModal.requiredExperiment.name }</strong>
+						{ ' ' }{ __( 'to be enabled first.', 'gutenberg-experiments-page' ) }
+					</Text>
+					<Text style={ { marginTop: '12px', display: 'block' } }>
+						{ __( 'Would you like to enable both experiments?', 'gutenberg-experiments-page' ) }
+					</Text>
+					<div className="gutenberg-experiments-page__modal-actions">
+						<Button
+							variant="secondary"
+							onClick={ () => setDependencyModal( null ) }
+						>
+							{ __( 'Cancel', 'gutenberg-experiments-page' ) }
+						</Button>
+						<Button
+							variant="primary"
+							onClick={ handleConfirmEnableWithDependency }
+						>
+							{ __( 'Enable Both', 'gutenberg-experiments-page' ) }
 						</Button>
 					</div>
 				</Modal>

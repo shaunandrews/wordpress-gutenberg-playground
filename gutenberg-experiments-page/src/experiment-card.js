@@ -61,28 +61,27 @@ const EXPERIMENT_ICONS = {
 /**
  * Individual experiment card component.
  *
- * @param {Object}   props                 Component props.
- * @param {Object}   props.experiment      Experiment data.
- * @param {Function} props.onToggle        Toggle handler.
- * @param {boolean}  props.isSaving        Whether the experiment is currently saving.
- * @param {boolean}  props.isDisabled      Whether the toggle should be disabled.
- * @param {string}   props.disabledReason  Reason for being disabled.
- * @param {string}   props.savedState      State of recent save: 'enabled', 'disabled', or undefined.
+ * @param {Object}   props                    Component props.
+ * @param {Object}   props.experiment         Experiment data.
+ * @param {Function} props.onToggle           Toggle handler.
+ * @param {boolean}  props.isSaving           Whether the experiment is currently saving.
+ * @param {Object}   props.requiredExperiment The required experiment if dependency is unmet.
+ * @param {string}   props.savedState         State of recent save: 'enabled', 'disabled', or undefined.
  */
 export default function ExperimentCard( {
 	experiment,
 	onToggle,
 	isSaving,
-	isDisabled,
-	disabledReason,
+	requiredExperiment,
 	savedState,
 } ) {
 	const { id, name, description, warning, learnMore, enabled, icon } = experiment;
 	const ExperimentIcon = EXPERIMENT_ICONS[ icon ] || plugins;
+	const hasDependency = !! requiredExperiment;
 
 	const cardClasses = [
 		'experiment-card',
-		isDisabled && 'experiment-card--disabled',
+		hasDependency && 'experiment-card--has-dependency',
 		enabled && 'experiment-card--enabled',
 		savedState && 'experiment-card--saved',
 		isSaving && 'experiment-card--saving',
@@ -125,8 +124,8 @@ export default function ExperimentCard( {
 								<ToggleControl
 									__nextHasNoMarginBottom
 									checked={ enabled }
-									onChange={ ( value ) => onToggle( id, value ) }
-									disabled={ isDisabled || isSaving }
+									onChange={ ( value ) => onToggle( id, value, requiredExperiment ) }
+									disabled={ isSaving }
 								/>
 							) }
 						</div>
@@ -142,9 +141,13 @@ export default function ExperimentCard( {
 						<Text>{ warning }</Text>
 					</div>
 				) }
-				{ disabledReason && (
-					<div className="experiment-card__disabled-reason">
-						<Text>{ disabledReason }</Text>
+				{ requiredExperiment && (
+					<div className="experiment-card__dependency-notice">
+						<Text>
+							{ __( 'Requires', 'gutenberg-experiments-page' ) }{ ' ' }
+							<strong>{ requiredExperiment.name }</strong>
+							{ ' ' }{ __( 'to be enabled.', 'gutenberg-experiments-page' ) }
+						</Text>
 					</div>
 				) }
 			</CardBody>

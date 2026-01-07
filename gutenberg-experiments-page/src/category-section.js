@@ -28,14 +28,14 @@ export default function CategorySection( {
 	const enabledCount = experiments.filter( ( exp ) => exp.enabled ).length;
 
 	/**
-	 * Check if an experiment should be disabled due to unmet dependencies.
+	 * Get the required experiment if dependency is unmet.
 	 *
 	 * @param {Object} experiment The experiment to check.
-	 * @return {Object} Object with isDisabled and reason.
+	 * @return {Object|null} The required experiment object, or null if no unmet dependency.
 	 */
-	const getDisabledState = ( experiment ) => {
+	const getRequiredExperiment = ( experiment ) => {
 		if ( ! experiment.requires ) {
-			return { isDisabled: false, reason: null };
+			return null;
 		}
 
 		const requiredExp = allExperiments.find(
@@ -43,13 +43,10 @@ export default function CategorySection( {
 		);
 
 		if ( requiredExp && ! requiredExp.enabled ) {
-			return {
-				isDisabled: true,
-				reason: `Requires "${ requiredExp.name }" to be enabled first.`,
-			};
+			return requiredExp;
 		}
 
-		return { isDisabled: false, reason: null };
+		return null;
 	};
 
 	return (
@@ -62,15 +59,14 @@ export default function CategorySection( {
 			</header>
 			<div className="experiments-category__grid">
 				{ experiments.map( ( experiment ) => {
-					const { isDisabled, reason } = getDisabledState( experiment );
+					const requiredExperiment = getRequiredExperiment( experiment );
 					return (
 						<ExperimentCard
 							key={ experiment.id }
 							experiment={ experiment }
 							onToggle={ onToggle }
 							isSaving={ savingIds.has( experiment.id ) }
-							isDisabled={ isDisabled }
-							disabledReason={ reason }
+							requiredExperiment={ requiredExperiment }
 							savedState={ recentlySaved.get( experiment.id ) }
 						/>
 					);
