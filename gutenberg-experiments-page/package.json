@@ -1,0 +1,23 @@
+{
+	"name": "gutenberg-experiments-page",
+	"version": "1.0.0",
+	"description": "A modern card-based UI for the Gutenberg experiments settings page.",
+	"author": "WordPress Contributors",
+	"license": "GPL-2.0-or-later",
+	"main": "build/index.js",
+	"scripts": {
+		"build": "wp-scripts build",
+		"start": "wp-scripts start"
+	},
+	"dependencies": {
+		"@wordpress/api-fetch": "^7.0.0",
+		"@wordpress/components": "^28.0.0",
+		"@wordpress/element": "^6.0.0",
+		"@wordpress/i18n": "^5.0.0",
+		"@wordpress/icons": "^10.0.0"
+	},
+	"devDependencies": {
+		"@babel/runtime": "^7.28.4",
+		"@wordpress/scripts": "^28.0.0"
+	}
+}
