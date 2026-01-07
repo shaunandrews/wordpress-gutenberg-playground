@@ -143,6 +143,33 @@ These are exposed via the REST API at `/wp-json/wp/v2/settings`.
 
 See [docs/writing-guidance-settings.md](docs/writing-guidance-settings.md) for details.
 
+### Mock Data Seeding
+
+Quickly populate your WordPress site with realistic mock content using the included seeding script:
+
+```bash
+./seed-mock-data.sh
+```
+
+**Features:**
+
+- **Three site topics**: Small Band, Coffee Shop, or Local Organization — each with themed content
+- **Configurable volume**: Small (5 posts), Medium (15 posts), or Large (30 posts)
+- **Complete content**: Creates pages, posts, comments, and featured images
+- **Reset option**: Clear all existing content before generating new data
+
+The script requires wp-env to be running. It uses WP-CLI to create content directly in WordPress.
+
+**Example usage:**
+
+1. Start wp-env: `cd gutenberg && npm run wp-env start`
+2. Run the script: `./seed-mock-data.sh`
+3. Choose a topic (e.g., "Coffee Shop")
+4. Choose a volume (e.g., "Medium")
+5. Confirm to generate content
+
+To reset all content without generating new data, select "Reset all content" from the main menu.
+
 ## Configuration
 
 The `wp-env` configuration in `gutenberg/.wp-env.override.json` maps:
