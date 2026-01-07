@@ -1,0 +1,122 @@
+/**
+ * Modern Reading Settings styles.
+ * Uses WordPress design tokens for consistency.
+ */
+
+.mrs-settings {
+	max-width: 800px;
+	padding: 20px 0;
+
+	h1 {
+		font-size: 1.75rem;
+		font-weight: 600;
+		margin-bottom: 24px;
+		color: var(--wp-components-color-foreground);
+	}
+
+	.components-card {
+		margin-bottom: 24px;
+
+		.components-card__header {
+			h2 {
+				margin: 0;
+				font-size: 1rem;
+				font-weight: 600;
+			}
+		}
+
+		.components-card__footer {
+			justify-content: flex-start;
+		}
+	}
+
+	.components-notice {
+		margin: 0 0 16px;
+	}
+}
+
+.mrs-loading {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	min-height: 300px;
+	gap: 16px;
+
+	p {
+		color: var(--wp-components-color-foreground);
+		font-size: 14px;
+		margin: 0;
+	}
+}
+
+// Panel styling.
+.mrs-settings .components-panel {
+	border: none;
+	background: transparent;
+	margin-bottom: 16px;
+
+	&:last-child {
+		margin-bottom: 0;
+	}
+
+	.components-panel__body {
+		border: 1px solid var(--wp-components-color-gray-200);
+		border-radius: 4px;
+		background: var(--wp-components-color-background);
+
+		.components-panel__body-title {
+			.components-button {
+				font-size: 14px;
+				font-weight: 600;
+			}
+		}
+	}
+
+	.components-panel__row {
+		margin-bottom: 16px;
+
+		&:last-child {
+			margin-bottom: 0;
+		}
+
+		.components-base-control,
+		.components-toggle-control,
+		.components-radio-control {
+			width: 100%;
+		}
+	}
+}
+
+// Form controls.
+.mrs-settings .components-base-control {
+	.components-base-control__label {
+		font-weight: 500;
+		color: var(--wp-components-color-foreground);
+	}
+
+	.components-base-control__help {
+		font-size: 12px;
+		color: var(--wp-components-color-foreground);
+		opacity: 0.7;
+	}
+}
+
+.mrs-settings .components-text-control__input,
+.mrs-settings .components-select-control__input {
+	border-color: var(--wp-components-color-gray-300);
+	border-radius: 4px;
+
+	&:focus {
+		border-color: var(--wp-admin-theme-color);
+		box-shadow: 0 0 0 1px var(--wp-admin-theme-color);
+	}
+}
+
+// Description links.
+.mrs-description {
+	margin-top: 16px;
+	font-size: 13px;
+	color: var(--wp-components-color-foreground);
+	opacity: 0.8;
+}
