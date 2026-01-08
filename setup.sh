@@ -69,6 +69,13 @@ fi
 NPM_VERSION=$(npm -v)
 echo -e "${GREEN}✓${NC} npm is installed ($NPM_VERSION)"
 
+# Check git
+if ! command -v git &> /dev/null; then
+    echo -e "${RED}Error: git is not installed.${NC}"
+    exit 1
+fi
+echo -e "${GREEN}✓${NC} Git is installed"
+
 # Check yarn (needed for Calypso)
 if [ "$SETUP_CALYPSO" = true ]; then
     if ! command -v yarn &> /dev/null; then
@@ -81,10 +88,58 @@ if [ "$SETUP_CALYPSO" = true ]; then
     echo -e "${GREEN}✓${NC} Yarn is installed ($YARN_VERSION)"
 fi
 
-# Gutenberg setup
+# Clone/setup wordpress-develop
+echo ""
+echo -e "${BLUE}Setting up WordPress Core (wordpress-develop)...${NC}"
+
+if [ ! -d "$SCRIPT_DIR/wordpress-develop" ]; then
+    echo "Cloning wordpress-develop from your fork..."
+    git clone https://github.com/shaunandrews/wordpress-develop.git "$SCRIPT_DIR/wordpress-develop"
+    cd "$SCRIPT_DIR/wordpress-develop"
+    echo "Adding upstream remote..."
+    git remote add upstream https://github.com/WordPress/wordpress-develop.git
+    cd "$SCRIPT_DIR"
+else
+    echo -e "${GREEN}✓${NC} wordpress-develop directory already exists"
+fi
+
+cd "$SCRIPT_DIR/wordpress-develop"
+echo "Installing wordpress-develop dependencies..."
+npm install
+
+echo ""
+echo "Building WordPress Core..."
+npm run build
+
+cd "$SCRIPT_DIR"
+
+# Clone/setup Gutenberg
 echo ""
 echo -e "${BLUE}Setting up Gutenberg...${NC}"
+
+if [ ! -d "$SCRIPT_DIR/gutenberg" ]; then
+    echo "Cloning Gutenberg..."
+    git clone https://github.com/WordPress/gutenberg.git "$SCRIPT_DIR/gutenberg"
+else
+    echo -e "${GREEN}✓${NC} Gutenberg directory already exists"
+fi
+
 cd "$SCRIPT_DIR/gutenberg"
+
+# Create .wp-env.override.json if it doesn't exist
+if [ ! -f "$SCRIPT_DIR/gutenberg/.wp-env.override.json" ]; then
+    echo "Creating .wp-env.override.json..."
+    cat > "$SCRIPT_DIR/gutenberg/.wp-env.override.json" << 'EOF'
+{
+	"core": "../wordpress-develop/build",
+	"mappings": {
+		"wp-content/plugins/gutenberg-experiments-page": "../plugins/gutenberg-experiments-page",
+		"wp-content/plugins/modern-reading-settings": "../plugins/modern-reading-settings",
+		"wp-content/plugins/reading-time-estimator": "../plugins/reading-time-estimator"
+	}
+}
+EOF
+fi
 
 echo "Installing Gutenberg dependencies..."
 npm install
@@ -96,6 +151,11 @@ npm run build
 echo ""
 echo "Starting wp-env..."
 npm run wp-env start
+
+# Activate plugins
+echo ""
+echo "Activating plugins..."
+npm run wp-env run cli wp plugin activate gutenberg-experiments-page modern-reading-settings reading-time-estimator 2>/dev/null || true
 
 cd "$SCRIPT_DIR"
 
@@ -155,6 +215,9 @@ echo "Password: password"
 echo ""
 echo "To stop WordPress:"
 echo "  cd gutenberg && npm run wp-env stop"
+echo ""
+echo "To update all repos:"
+echo "  ./update-repos.sh"
 echo ""
 
 if [ "$SETUP_CALYPSO" = true ]; then
