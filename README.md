@@ -192,17 +192,6 @@ Access Calypso at: http://calypso.localhost:3000
 
 ## Custom Features
 
-### Writing Guidance Settings
-
-This playground includes a custom feature that adds two new fields to **Settings > Writing**:
-
-- **Expectations**: Guidelines for how content should be written
-- **Goals**: What the site's content should achieve
-
-These are exposed via the REST API at `/wp-json/wp/v2/settings`.
-
-See [docs/writing-guidance-settings.md](docs/writing-guidance-settings.md) for details.
-
 ### Mock Data Seeding
 
 Quickly populate your WordPress site with realistic mock content using the included seeding script:
