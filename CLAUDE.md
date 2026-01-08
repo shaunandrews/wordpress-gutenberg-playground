@@ -15,6 +15,15 @@ The custom "Writing Guidance" feature adds settings to Settings > Writing for co
 
 All commands run from the `gutenberg/` directory unless noted.
 
+### Quick Start
+
+```bash
+./setup.sh                    # First-time setup (install deps, build, start wp-env)
+./dev.sh                      # Run all dev servers at once
+./dev.sh --with-calypso       # Include Calypso dev server
+./dev.sh --stop               # Stop all dev servers and wp-env
+```
+
 ### Environment (requires Docker)
 ```bash
 npm run wp-env start          # Start environment
@@ -23,6 +32,15 @@ npm run wp-env destroy        # Full reset
 ```
 
 Access: http://localhost:8888 (admin: `admin`/`password`)
+
+### Development Servers
+
+Run `./dev.sh` from the repo root to start all dev servers concurrently:
+- Gutenberg (`npm run dev`)
+- All plugins in `plugins/` that have a `start` script
+- Calypso (optional, with `--with-calypso` flag)
+
+The script auto-detects plugins, installs missing dependencies, and provides colored output with prefixes for each server. Press Ctrl+C to stop all servers.
 
 ### Building
 ```bash
@@ -63,6 +81,7 @@ vendor/bin/phpcs              # Check PHP standards
 
 ## Key Directories
 
+- `/plugins/` - Custom example plugins for this playground
 - `/packages/` - Gutenberg JavaScript packages (each has README.md)
 - `/lib/` - Gutenberg PHP code
 - `/lib/compat/wordpress-X.Y/` - Version-specific features (new PHP features go here)
@@ -101,12 +120,12 @@ WordPress PHP changes take effect immediately. Gutenberg JS/React changes requir
 
 ### Adding Custom Plugins
 
-To add a standalone WordPress plugin to the environment:
+Custom plugins live in the `plugins/` directory at the repo root. To add a new plugin:
 
-1. Create your plugin directory at the repo root (e.g., `my-plugin/`)
+1. Create your plugin directory in `plugins/` (e.g., `plugins/my-plugin/`)
 2. Add mapping to `gutenberg/.wp-env.override.json`:
    ```json
-   "wp-content/plugins/my-plugin": "../my-plugin"
+   "wp-content/plugins/my-plugin": "../plugins/my-plugin"
    ```
 3. Restart wp-env (see above)
 4. Activate via WP-CLI: `npm run wp-env run cli wp plugin activate my-plugin`
@@ -133,7 +152,7 @@ Options: `wp_writing_guidance_expectations`, `wp_writing_guidance_goals`
 
 ## Example Plugin: Reading Time Estimator
 
-Located at `reading-time-estimator/`, this is a complete example WordPress plugin demonstrating:
+Located at `plugins/reading-time-estimator/`, this is a complete example WordPress plugin demonstrating:
 
 - **Modern WordPress Components**: React-based admin UI using `@wordpress/components`
 - **Design Tokens**: Proper use of WordPress CSS custom properties (`--wp-admin-theme-color`, `--wp-components-color-*`)
@@ -144,7 +163,7 @@ Located at `reading-time-estimator/`, this is a complete example WordPress plugi
 ### Building the Plugin
 
 ```bash
-cd reading-time-estimator
+cd plugins/reading-time-estimator
 npm install                   # Install dependencies
 npm run build                 # Production build
 npm run start                 # Development with watch
@@ -153,7 +172,7 @@ npm run start                 # Development with watch
 ### Plugin Architecture
 
 ```
-reading-time-estimator/
+plugins/reading-time-estimator/
 ├── reading-time-estimator.php    # Main plugin file
 ├── includes/                      # PHP classes
 │   ├── class-settings.php        # REST API & settings
