@@ -4,9 +4,10 @@ A development environment for prototyping WordPress plugins and testing changes 
 
 ## Features
 
-- **Prototype plugins quickly** — Create plugins at the repo root to explore concepts and ideas
+- **Prototype plugins quickly** — Create plugins in `plugins/` to explore concepts and ideas
 - **Modify WordPress core** — Custom changes in `wordpress-develop/`
 - **Modify Gutenberg** — Custom plugin changes in `gutenberg/`
+- **Develop with Calypso** — Optional WP-Calypso integration for WordPress.com admin development
 - **Pre-configured wp-env** — Everything linked together, ready to run
 - Example plugin (`reading-time-estimator/`) demonstrating modern WordPress patterns
 
@@ -16,6 +17,7 @@ A development environment for prototyping WordPress plugins and testing changes 
 - [Node.js](https://nodejs.org/) (LTS version recommended, v18+)
 - [npm](https://www.npmjs.com/) (comes with Node.js)
 - [Git](https://git-scm.com/)
+- [Yarn](https://yarnpkg.com/) (required for Calypso, installed via corepack if missing)
 
 ## Quick Start
 
@@ -26,6 +28,9 @@ cd wordpress-gutenberg-playground
 
 # Run the setup script
 ./setup.sh
+
+# Or include Calypso (for WordPress.com admin development)
+./setup.sh --with-calypso
 ```
 
 Or manually:
@@ -55,29 +60,43 @@ Once running:
 
 ```
 wordpress-gutenberg-playground/
-├── gutenberg/              # Gutenberg plugin (with custom changes)
-├── wordpress-develop/      # WordPress core (with custom changes)
-├── reading-time-estimator/ # Example plugin (reference implementation)
+├── gutenberg/              # Gutenberg plugin (separate git repo)
+├── wordpress-develop/      # WordPress core (separate git repo, forked)
+├── calypso/                # WP-Calypso (separate git repo, optional)
+├── plugins/                # Custom prototype plugins
+│   └── reading-time-estimator/  # Example plugin
 ├── docs/                   # Custom documentation
-├── setup.sh                # Setup script
+├── setup.sh                # Initial setup script
+├── dev.sh                  # Run all dev servers
+├── update-repos.sh         # Pull latest from all repos
 ├── PLUGIN-SETUP.md         # Guide for creating plugins
 └── README.md
 ```
 
+The main repos (`gutenberg/`, `wordpress-develop/`, `calypso/`) are **separate git repositories** cloned into this directory. They're listed in `.gitignore` and not tracked by the monorepo.
+
 ## Development Workflow
 
-### Starting the Environment
+### Starting Development
+
+The easiest way to start developing is with the `dev.sh` script, which runs all dev servers concurrently:
+
+```bash
+./dev.sh                    # Start Gutenberg + all plugins
+./dev.sh --with-calypso     # Also start Calypso
+./dev.sh --stop             # Stop all servers and wp-env
+```
+
+This auto-detects plugins in `plugins/`, installs missing dependencies, and provides colored output with prefixes for each server. Press Ctrl+C to stop all servers.
+
+### Manual Control
 
 From the `gutenberg/` directory:
 
 ```bash
-npm run wp-env start
-```
-
-### Stopping the Environment
-
-```bash
-npm run wp-env stop
+npm run wp-env start        # Start the WordPress environment
+npm run wp-env stop         # Stop the environment
+npm run dev                 # Start Gutenberg dev server only
 ```
 
 ### Rebuilding After Changes
@@ -102,14 +121,14 @@ npm run wp-env run cli wp <command>
 
 ## Creating Plugins
 
-This playground is designed for quickly spinning up plugins to explore concepts and prototype ideas. Plugins live at the repo root and are mapped into WordPress via `gutenberg/.wp-env.override.json`.
+This playground is designed for quickly spinning up plugins to explore concepts and prototype ideas. Plugins live in the `plugins/` directory and are mapped into WordPress via `gutenberg/.wp-env.override.json`.
 
 **Quick start:**
 
 ```bash
 # 1. Create plugin directory with main file
-mkdir my-plugin
-cat > my-plugin/my-plugin.php << 'EOF'
+mkdir plugins/my-plugin
+cat > plugins/my-plugin/my-plugin.php << 'EOF'
 <?php
 /**
  * Plugin Name: My Plugin
@@ -118,7 +137,7 @@ cat > my-plugin/my-plugin.php << 'EOF'
 EOF
 
 # 2. Add to gutenberg/.wp-env.override.json mappings:
-#    "wp-content/plugins/my-plugin": "../my-plugin"
+#    "wp-content/plugins/my-plugin": "../plugins/my-plugin"
 
 # 3. Restart wp-env and activate
 cd gutenberg
@@ -128,7 +147,48 @@ npm run wp-env run cli wp plugin activate my-plugin
 
 For plugins with React-based admin UIs using `@wordpress/components`, see the complete guide in **[PLUGIN-SETUP.md](PLUGIN-SETUP.md)**.
 
-The `reading-time-estimator/` directory contains a full reference implementation demonstrating modern WordPress plugin patterns.
+The `plugins/reading-time-estimator/` directory contains a full reference implementation demonstrating modern WordPress plugin patterns.
+
+## WP-Calypso Integration
+
+[WP-Calypso](https://github.com/Automattic/wp-calypso) is the React-based admin interface that powers WordPress.com. This playground optionally includes Calypso for developers working on the WordPress.com admin experience.
+
+### Why Include Calypso?
+
+- **Test Dashboard changes** — Develop WordPress.com Dashboard features alongside core WordPress changes
+- **Unified environment** — Run Calypso, Gutenberg, and WordPress core together
+- **Cross-project prototyping** — Useful for Automattic developers working across the ecosystem
+
+### Setting Up Calypso
+
+```bash
+# During initial setup
+./setup.sh --with-calypso
+
+# Or add to existing setup
+git clone https://github.com/Automattic/wp-calypso.git calypso
+cd calypso && yarn install
+```
+
+**Required:** Add `calypso.localhost` to your hosts file:
+
+```bash
+sudo sh -c 'echo "127.0.0.1 calypso.localhost" >> /etc/hosts'
+```
+
+### Running Calypso
+
+```bash
+# With dev.sh (recommended)
+./dev.sh --with-calypso
+
+# Or manually
+cd calypso && yarn start:debug
+```
+
+Access Calypso at: http://calypso.localhost:3000
+
+**Note:** Calypso uses `yarn start:debug` instead of `yarn start` due to webpack memory requirements.
 
 ## Custom Features
 
@@ -174,11 +234,10 @@ To reset all content without generating new data, select "Reset all content" fro
 
 The `wp-env` configuration in `gutenberg/.wp-env.override.json` maps:
 
-- WordPress core source from `wordpress-develop/src`
-- Gutenberg plugin from `gutenberg/`
-- Custom plugins from the repo root
+- WordPress core from `wordpress-develop/build/`
+- Custom plugins from `plugins/`
 
-This allows custom WordPress core changes, Gutenberg changes, and prototype plugins to work together.
+This allows WordPress core changes, Gutenberg changes, and prototype plugins to work together seamlessly.
 
 ## Troubleshooting
 
@@ -215,41 +274,23 @@ npm run wp-env start
 
 ## Syncing with Upstream
 
-This monorepo contains flattened copies of WordPress and Gutenberg. To sync with upstream changes:
-
-### Gutenberg
+The repos in this monorepo are full git clones with remotes already configured. Use the update script to pull the latest changes:
 
 ```bash
-# Add upstream as a remote temporarily
-cd gutenberg
-git init
-git remote add upstream https://github.com/WordPress/gutenberg.git
-git fetch upstream trunk
-
-# Review and apply changes
-git diff upstream/trunk -- .
-
-# Or cherry-pick specific commits
-git cherry-pick <commit-hash>
-
-# Clean up
-rm -rf .git
+./update-repos.sh              # Update all repos
+./update-repos.sh gutenberg    # Update specific repo
+./update-repos.sh calypso      # Update Calypso only
 ```
 
-### WordPress Core
+Or manually:
 
 ```bash
-cd wordpress-develop
-git init
-git remote add upstream https://github.com/WordPress/wordpress-develop.git
-git fetch upstream trunk
-
-# Review and apply changes
-git diff upstream/trunk -- .
-
-# Clean up
-rm -rf .git
+cd gutenberg && git pull origin trunk
+cd wordpress-develop && git pull upstream trunk
+cd calypso && git pull origin trunk
 ```
+
+**Important:** Always pull before pushing to avoid conflicts with remote branches.
 
 ## License
 

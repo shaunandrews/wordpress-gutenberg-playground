@@ -116,6 +116,8 @@ vendor/bin/phpcs              # Check PHP standards
 - `/gutenberg/lib/compat/wordpress-X.Y/` - Version-specific features
 - `/wordpress-develop/src/` - WordPress core source
 - `/wordpress-develop/build/` - Built WordPress (used by wp-env)
+- `/calypso/client/` - Calypso React application source
+- `/calypso/packages/` - Calypso shared packages
 
 ## Architecture
 
@@ -210,3 +212,36 @@ plugins/reading-time-estimator/
 ```
 
 After building, the plugin is available at Settings > Reading Time in the WordPress admin.
+
+## WP-Calypso
+
+WP-Calypso is the React-based admin interface that powers WordPress.com. It's optional in this playground but useful for Automattic developers working on the WordPress.com Dashboard.
+
+### Setup Requirements
+
+Calypso requires:
+- Yarn (installed via corepack if missing)
+- `calypso.localhost` in `/etc/hosts`: `sudo sh -c 'echo "127.0.0.1 calypso.localhost" >> /etc/hosts'`
+
+### Building Calypso
+
+```bash
+cd calypso
+yarn install                  # Install dependencies (can take 5-15 minutes)
+yarn start:debug              # Start dev server (uses less memory than yarn start)
+```
+
+Access: http://calypso.localhost:3000
+
+### Key Calypso Paths
+
+- `/calypso/client/` - Main React application
+- `/calypso/client/my-sites/` - Site management sections
+- `/calypso/client/components/` - Shared React components
+- `/calypso/packages/` - Shared packages (design system, utilities)
+
+### Calypso Development Notes
+
+- Use `yarn start:debug` instead of `yarn start` due to webpack memory requirements
+- Calypso uses its own component library, not `@wordpress/components`
+- The `./dev.sh --with-calypso` script handles starting Calypso alongside other dev servers
