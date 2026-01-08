@@ -33,3 +33,5 @@ Thumbs.db
 
 # External repos (cloned separately)
 calypso/
+gutenberg/
+wordpress-develop/
