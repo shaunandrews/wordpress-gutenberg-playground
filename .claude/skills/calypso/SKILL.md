@@ -1,6 +1,6 @@
 ---
 name: calypso
-description: "Calypso reference skill for WordPress imports and E2E testing. Use when working on: (1) Looking up @wordpress package exports, (2) Writing E2E tests with Playwright, (3) Migrating legacy tests, (4) Understanding test fixtures, or (5) Debugging test failures."
+description: "Calypso reference skill for WordPress imports and E2E testing. Use when working on: (1) Looking up @wordpress package exports, (2) Writing E2E tests with Playwright, (3) Migrating legacy tests, (4) Understanding test fixtures, (5) Debugging test failures, (6) Feature flags usage, or (7) SCSS styling with WordPress tokens."
 ---
 
 # Calypso Skill
@@ -8,6 +8,62 @@ description: "Calypso reference skill for WordPress imports and E2E testing. Use
 This skill provides reference material for Calypso development:
 - **WordPress Imports**: See [references/wordpress-imports.md](references/wordpress-imports.md) for complete `@wordpress/*` package exports
 - **E2E Testing**: Playwright Test patterns and migration guide (below)
+- **Feature Flags**: Quick reference for gating features
+
+---
+
+# Feature Flags
+
+Calypso uses feature flags to gate new features. Quick reference:
+
+## Adding a Feature Flag
+
+```json
+// config/development.json
+{ "features": { "me/my-feature": true } }
+
+// config/production.json
+{ "features": { "me/my-feature": false } }
+```
+
+## Using in Code
+
+```typescript
+import { isEnabled } from '@automattic/calypso-config';
+
+const isFeatureEnabled = isEnabled( 'me/my-feature' );
+```
+
+## Testing via URL
+
+- Enable: `?flags=me/my-feature`
+- Disable: `?flags=-me/my-feature`
+
+**Important:** Config changes require server restart (hot reload doesn't pick them up).
+
+---
+
+# Styling Quick Reference
+
+Dashboard components use SCSS with WordPress tokens. Always create `style.scss` files - avoid inline styles.
+
+```scss
+@import '@wordpress/base-styles/variables';
+
+.my-component {
+  padding: $grid-unit-15;        // 12px
+  border-radius: $radius-medium; // 4px
+  gap: $grid-unit-10;            // 8px
+}
+```
+
+| Token | Value |
+|-------|-------|
+| `$grid-unit-05` | 4px |
+| `$grid-unit-10` | 8px |
+| `$grid-unit-15` | 12px |
+| `$grid-unit-20` | 16px |
+| `$radius-medium` | 4px |
 
 ---
 

@@ -207,24 +207,51 @@ import clsx from 'clsx';
 
 // Use i18n-calypso for translations
 import { useTranslate } from 'i18n-calypso';
+
+// Dashboard uses @wordpress/i18n
+import { __ } from '@wordpress/i18n';
 ```
 
-### Styling
+### Styling Best Practices
+
+**Always use SCSS files with WordPress tokens - avoid inline styles.**
 
 ```scss
+// Import WordPress base styles for tokens
+@import '@wordpress/base-styles/variables';
+
 // Write full class names (no BEM shortcuts like &__ or &--)
 .my-component {
-    // ...
+    padding: $grid-unit-15;
+    border-radius: $radius-medium;
+    background: var( --color-surface );
 }
 
 .my-component__title {
-    // ...
+    margin: 0 0 $grid-unit-05;
+    // Let text use default font-size - don't override unless necessary
 }
 
 // Use RTL-friendly properties
-margin-inline-start: 16px;  // not margin-left
-padding-inline-end: 8px;    // not padding-right
+.my-component__content {
+    margin-inline-start: $grid-unit-20;  // not margin-left
+    padding-inline-end: $grid-unit-10;   // not padding-right
+}
 ```
+
+**WordPress SCSS Tokens (from `@wordpress/base-styles/variables`):**
+
+| Category | Examples |
+|----------|----------|
+| Spacing | `$grid-unit-05`, `$grid-unit-10`, `$grid-unit-15`, `$grid-unit-20` |
+| Radius | `$radius-small`, `$radius-medium`, `$radius-large` |
+| Colors | `$gray-700`, `$gray-100`, or `var(--color-surface)`, `var(--color-text)` |
+| Typography | `$font-size-small`, `$font-size-medium` (use sparingly - prefer defaults) |
+
+**Don't:**
+- Use inline styles for layout/spacing
+- Use raw px values when tokens exist
+- Override font-sizes unless absolutely necessary
 
 ### State Management
 
@@ -234,6 +261,107 @@ import { useSelect, useDispatch } from '@wordpress/data';
 
 // Common stores
 import { store as coreStore } from '@wordpress/core-data';
+```
+
+---
+
+## Feature Flags
+
+Calypso uses feature flags to gate new features. Flags are defined in config files and checked at runtime.
+
+### Adding a Feature Flag
+
+1. **Add to config files** (alphabetically sorted within the `features` object):
+
+```json
+// config/development.json - enabled for local dev
+{
+  "features": {
+    "me/my-new-feature": true
+  }
+}
+
+// config/production.json - disabled in production initially
+{
+  "features": {
+    "me/my-new-feature": false
+  }
+}
+```
+
+2. **Use in code:**
+
+```typescript
+import { isEnabled } from '@automattic/calypso-config';
+
+function MyComponent() {
+    const isNewFeatureEnabled = isEnabled( 'me/my-new-feature' );
+
+    if ( isNewFeatureEnabled ) {
+        return <NewDesign />;
+    }
+    return <OldDesign />;
+}
+```
+
+3. **Test via URL:** Toggle flags without rebuilding:
+   - Enable: `?flags=me/my-new-feature`
+   - Disable: `?flags=-me/my-new-feature`
+
+**Important:** Config file changes require a server restart (hot reload doesn't pick them up).
+
+---
+
+## Dashboard vs Classic Calypso
+
+Calypso has two main UI systems:
+
+| Aspect | Classic Calypso | Dashboard |
+|--------|-----------------|-----------|
+| URL | `calypso.localhost:3000` | `my.localhost:3000` |
+| Location | `client/me/`, `client/my-sites/` | `client/dashboard/` |
+| State | Redux | TanStack Query |
+| Routing | page.js | TanStack Router |
+| Components | Class + functional | Functional only |
+| Types | Mixed JS/TS | TypeScript |
+
+### Dashboard Component Structure
+
+```
+client/dashboard/
+├── app/                    # Router and app shell
+├── components/             # Shared dashboard components
+│   ├── card/
+│   ├── section-header/
+│   └── button-stack/
+├── me/                     # Account/profile pages
+│   └── profile-gravatar/   # Example: Gravatar settings
+│       ├── index.tsx       # Main component
+│       ├── edit-gravatar.tsx
+│       ├── gravatar-logo.tsx
+│       └── style.scss      # Component styles
+└── docs/                   # Dashboard documentation
+```
+
+### Dashboard Patterns
+
+```typescript
+// TanStack Query for data
+import { useMutation } from '@tanstack/react-query';
+import { userSettingsMutation } from '@automattic/api-queries';
+
+// WordPress components
+import {
+    Button,
+    __experimentalVStack as VStack,
+    __experimentalHStack as HStack,
+} from '@wordpress/components';
+
+// Translations
+import { __ } from '@wordpress/i18n';
+
+// Always create a style.scss for component styles
+import './style.scss';
 ```
 
 ---

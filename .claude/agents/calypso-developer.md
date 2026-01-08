@@ -73,7 +73,12 @@ import { useDispatch, useSelect } from '@wordpress/data';
 
 ### Style Conventions
 
+**Always create SCSS files for component styles - avoid inline styles.**
+
 ```scss
+// Import WordPress base styles for tokens
+@import '@wordpress/base-styles/variables';
+
 // DON'T use BEM-style nested selectors
 .my-component {
   &__header { } // Bad
@@ -85,20 +90,62 @@ import { useDispatch, useSelect } from '@wordpress/data';
 .my-component-header { }
 .my-component-active { }
 
+// Use WordPress spacing tokens
+.my-component {
+  padding: $grid-unit-15;           // Good - 12px
+  margin-bottom: $grid-unit-20;     // Good - 16px
+  gap: $grid-unit-10;               // Good - 8px
+  padding: 12px;                    // Bad - raw px values
+}
+
+// Use WordPress radius tokens
+.my-component {
+  border-radius: $radius-medium;    // Good
+  border-radius: 4px;               // Bad - raw px values
+}
+
 // Use RTL-aware properties
 .my-element {
-  margin-inline-start: 16px;  // Good
-  margin-left: 16px;          // Bad
-  padding-inline-end: 8px;    // Good
-  padding-right: 8px;         // Bad
+  margin-inline-start: $grid-unit-20;  // Good
+  margin-left: 16px;                    // Bad
+  padding-inline-end: $grid-unit-10;   // Good
+  padding-right: 8px;                   // Bad
 }
 
 // Use color tokens
 .my-element {
   color: var(--color-neutral-50);     // Good
+  background: var(--color-surface);   // Good
   color: var(--studio-gray-50);       // Bad - avoid studio colors
 }
+
+// Don't override font sizes unless necessary - let defaults apply
+.my-component-text {
+  margin: 0 0 $grid-unit-05;          // Good - just spacing
+  font-size: 12px;                    // Bad - overriding defaults
+}
+
+// Handle flex overflow properly
+.my-component-content {
+  display: flex;
+  flex: 1;
+  min-width: 0;        // Prevents flex children from overflowing
+  overflow: hidden;    // Contains overflow within the element
+}
 ```
+
+#### WordPress SCSS Tokens Reference
+
+| Category | Token | Value |
+|----------|-------|-------|
+| Spacing | `$grid-unit-05` | 4px |
+| Spacing | `$grid-unit-10` | 8px |
+| Spacing | `$grid-unit-15` | 12px |
+| Spacing | `$grid-unit-20` | 16px |
+| Spacing | `$grid-unit-30` | 24px |
+| Radius | `$radius-small` | 2px |
+| Radius | `$radius-medium` | 4px |
+| Radius | `$radius-large` | 8px |
 
 ### WordPress Spacing Convention
 
@@ -285,6 +332,60 @@ async function fetchSiteStats( siteId: number ): Promise<SiteStats> {
 
 ---
 
+## Feature Flags
+
+Calypso uses feature flags to gate new features. Flags are defined in config files and checked at runtime.
+
+### Adding a Feature Flag
+
+1. **Add to config files** (alphabetically sorted within `features`):
+
+```json
+// config/development.json - enabled for local dev
+{
+  "features": {
+    "me/my-new-feature": true
+  }
+}
+
+// config/production.json - disabled in production initially
+{
+  "features": {
+    "me/my-new-feature": false
+  }
+}
+```
+
+2. **Use in code:**
+
+```typescript
+import { isEnabled } from '@automattic/calypso-config';
+
+function MyComponent() {
+  const isNewFeatureEnabled = isEnabled( 'me/my-new-feature' );
+
+  if ( isNewFeatureEnabled ) {
+    return <NewDesign />;
+  }
+  return <OldDesign />;
+}
+```
+
+3. **Test via URL** (without rebuilding):
+   - Enable: `?flags=me/my-new-feature`
+   - Disable: `?flags=-me/my-new-feature`
+
+### Important Notes
+
+- **Config changes require server restart** - Hot reload doesn't pick up config file changes
+- Use feature flags for:
+  - New UI designs that need A/B testing
+  - Experimental features not ready for production
+  - Gradual rollouts
+- Remove feature flags once a feature is fully rolled out
+
+---
+
 ## Dashboard Development
 
 The WordPress.com Hosting Dashboard (`client/dashboard/`) implements modern web application patterns with TypeScript, TanStack Query, and TanStack Router.
@@ -298,6 +399,61 @@ For detailed implementation guidance, refer to the dashboard docs in the Calypso
 - `client/dashboard/docs/i18n.md` - Translation patterns, CSS logical properties
 - `client/dashboard/docs/typography-and-copy.md` - Capitalization, snackbar messages
 - `client/dashboard/docs/testing.md` - Testing strategies
+
+### Dashboard vs Classic Calypso
+
+The Dashboard (`my.localhost:3000`) is distinct from classic Calypso (`calypso.localhost:3000`):
+
+| Aspect | Classic Calypso | Dashboard |
+|--------|-----------------|-----------|
+| URL | `calypso.localhost:3000` | `my.localhost:3000` |
+| Location | `client/me/`, `client/my-sites/` | `client/dashboard/` |
+| State | Redux | TanStack Query |
+| Routing | page.js | TanStack Router |
+| Translations | `i18n-calypso` | `@wordpress/i18n` |
+
+### Dashboard Styling
+
+Dashboard components use SCSS files with WordPress tokens. Create a `style.scss` file alongside your component:
+
+```
+client/dashboard/me/my-feature/
+├── index.tsx       # Main component
+├── style.scss      # Component styles
+└── helper.tsx      # Helper components
+```
+
+```typescript
+// index.tsx
+import './style.scss';
+
+export default function MyFeature() {
+  return (
+    <div className="my-feature">
+      <div className="my-feature__content">...</div>
+    </div>
+  );
+}
+```
+
+```scss
+// style.scss
+@import '@wordpress/base-styles/variables';
+
+.my-feature {
+  background: rgba( 56, 88, 233, 0.06 );  // Subtle brand color
+  border-radius: $radius-medium;
+  padding: $grid-unit-15;
+  margin-top: $grid-unit-10;
+}
+
+.my-feature__content {
+  display: flex;
+  gap: $grid-unit-15;
+  min-width: 0;       // Prevent flex overflow
+  overflow: hidden;
+}
+```
 
 ### External Link Handling
 
