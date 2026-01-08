@@ -1,38 +1,169 @@
 /**
  * Modern Reading Settings styles.
- * Uses WordPress design tokens for consistency.
  */
 
 .mrs-settings {
-	max-width: 800px;
-	padding: 20px 0;
+	&__header {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 16px;
+		margin: -10px -22px 24px;
+		padding: 12px 20px;
+		background: #fff;
+		border-bottom: 1px solid var(--wp-components-color-gray-200, #e0e0e0);
 
-	h1 {
-		font-size: 1.75rem;
-		font-weight: 600;
-		margin-bottom: 24px;
-		color: var(--wp-components-color-foreground);
+		h1 {
+			font-size: 14px;
+			font-weight: 600;
+			margin: 0;
+		}
 	}
 
-	.components-card {
-		margin-bottom: 24px;
+	&__header-left {
+		display: flex;
+		align-items: center;
+		gap: 16px;
+	}
 
-		.components-card__header {
-			h2 {
-				margin: 0;
-				font-size: 1rem;
-				font-weight: 600;
-			}
-		}
+	&__description {
+		color: var(--wp-components-color-foreground, #1e1e1e);
+		opacity: 0.6;
+		font-size: 13px;
+		margin: 0;
 
-		.components-card__footer {
-			justify-content: flex-start;
+		@media (max-width: 600px) {
+			display: none;
 		}
+	}
+
+	&__content {
+		max-width: 600px;
+		margin: 0 auto;
 	}
 
 	.components-notice {
-		margin: 0 0 16px;
+		margin-bottom: 16px;
 	}
+
+	// Card header styling
+	.components-card__header h3 {
+		font-size: 13px;
+		font-weight: 600;
+		margin: 0;
+	}
+
+	// Number inputs
+	.components-text-control__input[type="number"] {
+		max-width: 80px;
+	}
+
+	// Page selects (side by side when there's room)
+	.mrs-page-selects {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 12px;
+		margin-top: 12px;
+
+		> .components-base-control {
+			flex: 1;
+			min-width: 160px;
+		}
+
+		> .components-notice {
+			flex-basis: 100%;
+		}
+	}
+
+	// RSS controls side by side
+	.mrs-rss-controls {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 16px;
+		align-items: flex-start;
+
+		> .components-base-control,
+		> .components-toggle-group-control {
+			flex: 1;
+			min-width: 180px;
+		}
+	}
+
+	// Help text styling
+	.mrs-help-text {
+		font-size: 13px;
+		color: var(--wp-components-color-foreground, #1e1e1e);
+		opacity: 0.6;
+	}
+}
+
+// Section header with heading and description
+.mrs-section-header {
+	h4 {
+		font-size: 13px;
+		font-weight: 600;
+		margin: 0 0 4px;
+	}
+}
+
+// Homepage section with illustration
+.mrs-homepage-section {
+	display: flex;
+	gap: 20px;
+
+	&__illustration {
+		flex-shrink: 0;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		width: 120px;
+		min-height: 140px;
+		background: var(--wp-components-color-gray-50, #f9f9f9);
+		border-radius: 4px;
+	}
+
+	&__controls {
+		flex: 1;
+		min-width: 0;
+	}
+}
+
+.mrs-homepage-illustration {
+	width: 100px;
+	height: auto;
+}
+
+// Search engine section with illustration
+.mrs-search-section {
+	display: flex;
+	gap: 20px;
+
+	&__illustration {
+		flex-shrink: 0;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		width: 120px;
+		min-height: 120px;
+		background: var(--wp-components-color-gray-50, #f9f9f9);
+		border-radius: 4px;
+	}
+
+	&__controls {
+		flex: 1;
+		min-width: 0;
+
+		h4 {
+			font-size: 13px;
+			font-weight: 600;
+			margin: 0;
+		}
+	}
+}
+
+.mrs-search-illustration {
+	width: 100px;
+	height: auto;
 }
 
 .mrs-loading {
@@ -40,83 +171,19 @@
 	flex-direction: column;
 	align-items: center;
 	justify-content: center;
-	min-height: 300px;
-	gap: 16px;
-
-	p {
-		color: var(--wp-components-color-foreground);
-		font-size: 14px;
-		margin: 0;
-	}
+	gap: 12px;
+	padding: 60px;
+	opacity: 0.6;
 }
 
-// Panel styling.
-.mrs-settings .components-panel {
-	border: none;
-	background: transparent;
-	margin-bottom: 16px;
+// Responsive
+@media (max-width: 500px) {
+	.mrs-homepage-section,
+	.mrs-search-section {
+		flex-direction: column;
 
-	&:last-child {
-		margin-bottom: 0;
-	}
-
-	.components-panel__body {
-		border: 1px solid var(--wp-components-color-gray-200);
-		border-radius: 4px;
-		background: var(--wp-components-color-background);
-
-		.components-panel__body-title {
-			.components-button {
-				font-size: 14px;
-				font-weight: 600;
-			}
+		&__illustration {
+			align-self: center;
 		}
 	}
-
-	.components-panel__row {
-		margin-bottom: 16px;
-
-		&:last-child {
-			margin-bottom: 0;
-		}
-
-		.components-base-control,
-		.components-toggle-control,
-		.components-radio-control {
-			width: 100%;
-		}
-	}
-}
-
-// Form controls.
-.mrs-settings .components-base-control {
-	.components-base-control__label {
-		font-weight: 500;
-		color: var(--wp-components-color-foreground);
-	}
-
-	.components-base-control__help {
-		font-size: 12px;
-		color: var(--wp-components-color-foreground);
-		opacity: 0.7;
-	}
-}
-
-.mrs-settings .components-text-control__input,
-.mrs-settings .components-select-control__input {
-	border-color: var(--wp-components-color-gray-300);
-	border-radius: 4px;
-
-	&:focus {
-		border-color: var(--wp-admin-theme-color);
-		box-shadow: 0 0 0 1px var(--wp-admin-theme-color);
-	}
-}
-
-// Description links.
-.mrs-description {
-	margin-top: 16px;
-	font-size: 13px;
-	color: var(--wp-components-color-foreground);
-	opacity: 0.8;
 }
