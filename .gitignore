@@ -30,3 +30,6 @@ Thumbs.db
 .idea/
 *.sublime-project
 *.sublime-workspace
+
+# External repos (cloned separately)
+calypso/
